@@ -1,10 +1,12 @@
 import dedent from 'ts-dedent';
-import { createApp, h, shallowRef, ComponentPublicInstance } from 'vue';
+import { createApp, h, shallowRef, ComponentPublicInstance, ref } from 'vue';
 import type { RenderContext } from '@storybook/store';
 import type { ArgsStoryFn } from '@storybook/csf';
 
 import { StoryFnVueReturnType } from './types';
-import { VueFramework } from './types-6-0';
+import { VueFramework, Args } from './types-6-0';
+
+export const args = ref<Args>();
 
 export const render: ArgsStoryFn<VueFramework> = (props, context) => {
   const { id, component: Component } = context;
@@ -38,7 +40,16 @@ export const storybookApp = createApp({
 });
 
 export function renderToDOM(
-  { title, name, storyFn, showMain, showError, showException }: RenderContext<VueFramework>,
+  {
+    title,
+    name,
+    storyFn,
+    showMain,
+    showError,
+    showException,
+    forceRemount,
+    storyContext,
+  }: RenderContext<VueFramework>,
   domElement: HTMLElement
 ) {
   storybookApp.config.errorHandler = showException;
@@ -58,7 +69,11 @@ export function renderToDOM(
 
   showMain();
 
-  activeStoryComponent.value = element;
+  if (forceRemount) {
+    activeStoryComponent.value = element;
+  }
+
+  args.value = storyContext.args;
 
   if (!root) {
     root = storybookApp.mount(domElement);

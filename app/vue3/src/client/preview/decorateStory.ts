@@ -5,6 +5,7 @@ import { sanitizeStoryContextUpdate } from '@storybook/store';
 
 import type { VueFramework } from './types-6-0';
 
+import { args } from './render';
 /*
   This normalizes a functional component into a render method in ComponentOptions.
 
@@ -33,9 +34,11 @@ function prepare(
     };
   }
 
+  story.inheritAttrs = false;
+
   return {
     render() {
-      return h(story);
+      return h(story, args.value);
     },
   };
 }
